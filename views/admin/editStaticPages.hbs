@@ -1,0 +1,27 @@
+<h1>Редактирование контента страниц</h1>
+
+{{#if pvm}}
+    {{#if pvm.length}}
+        {{#each pvm}}
+            <form action="/api/staticPage/setContent" method="post">
+                <div>{{this.pageName}}</div>
+
+                <div class="input-field">
+                    <input id="contacts" name="content" type="text" class="validate" value="{{this.content}}" required>
+                    <label for="contacts">HTML контент</label>
+                    <span class="helper-text" data-error="Введите html"></span>
+                </div>
+
+                <input type="hidden" name="pageName" value="{{this.pageName}}">
+
+                <input type="hidden" name="_csrf" value="{{@root.csrf}}">
+
+                <button class="btn btn-primary" type="submit">Сохранить</button>
+            </form>
+            <hr>
+        {{/each}}
+    {{/if}}
+{{/if}}
+
+
+

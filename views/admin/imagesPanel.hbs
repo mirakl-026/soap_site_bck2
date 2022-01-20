@@ -1,0 +1,96 @@
+<h2>Картинки:</h2>
+<h3>Категории</h3>
+{{#if imagesVM.collections.length}}
+    {{#each imagesVM.collections}}
+        <div>{{this}}</div>
+    {{/each}}
+{{/if}}
+
+<h3>Товары</h3>
+{{#if imagesVM.products.length}}
+    {{#each imagesVM.products}}
+        <div>{{this}}</div>
+    {{/each}}
+{{/if}}
+<hr>
+<hr>
+
+<div>Загрузка картинки товара</div>
+<form action='/api/image/product/addImage' id='uploadForm'  method='post' encType="multipart/form-data">
+    <input id="i_csrf" type="hidden" name="_csrf" value="{{csrf}}">
+    <div>
+        <input type="file" name="imageFile"/>
+    </div>
+    <button id="uploadImgProduct" class="btn btn-primary" type="submit" onclick="updateCSRFfields()">Добавить картинку товара</button>
+</form>
+<hr>
+
+<div>Загрузка картинки коллекции</div>
+<form action='/api/image/collection/addImage' id='uploadForm'  method='post' encType="multipart/form-data">
+    <input id="i_csrf" type="hidden" name="_csrf" value="{{csrf}}">
+    <div>
+        <input type="file" name="imageFile"/>
+    </div>
+    <button id="uploadImgCollection" class="btn btn-primary" type="submit" onclick="updateCSRFfields()">Добавить картинку категорий</button>
+</form>
+<hr>
+
+<div>Удаление картинки</div>
+<form action="/api/image/delete" method="post">
+    <input id="i_csrf" type="hidden" name="_csrf" value="{{csrf}}">
+
+    <input id="fileName" name="fileName" type="text" required>
+    <label for="fileName">Имя файла картинки</label>
+
+    <button id="deleteImg" class="btn btn-primary" type="submit" onclick="updateCSRFfields()">Удалить</button>
+
+</form>
+<hr>
+
+<div>Удаление картинки товара</div>
+<form action="/api/image/delete/product" method="post">
+    <input id="i_csrf" type="hidden" name="_csrf" value="{{csrf}}">
+
+    <input id="productImage_fileName" name="fileName" type="text"required>
+    <label for="productImage_fileName">Имя файла картинки товара</label>
+
+    <button id="deleteImgProduct" class="btn btn-primary" type="submit" onclick="updateCSRFfields()">Удалить</button>
+
+</form>
+<hr>
+
+<div>Удаление картинки коллекции</div>
+<form action="/api/image/delete/collection" method="post">
+    <input id="i_csrf" type="hidden" name="_csrf" value="{{csrf}}">
+
+    <input id="collectionImage_fileName" name="fileName" type="text" required>
+    <label for="collectionImage_fileName">Имя файла картинки коллекции</label>
+
+    <button id="deleteImgCollection" class="btn btn-primary" type="submit" onclick="updateCSRFfields()">Удалить</button>
+</form>
+
+<script>
+    function updateCSRFfields() {
+        console.log("get csrf");
+        const url = "http://localhost:3000/auth/getCSRFToken";
+
+        fetch(url, {
+            method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        })
+                .then(function(response) {
+                    console.log("response:", response);
+                    return response.json()
+                })
+                .then(function (data){
+                    console.log(data);
+                    result = data.csrfToken;
+                    console.log("auth:", result);
+                    let csrfToken = data.csrfToken;
+
+                    let csrfs = document.querySelectorAll("#i_csrf");
+                    for (let csrf_field of csrfs) {
+                        csrf_field.value = csrfToken;
+                    }
+                });
+    }
+</script>

@@ -1,0 +1,67 @@
+<h2>Управление заказами</h2>
+
+<!--  ->API /confirmOrder -->
+<a href="/admin/orderConfirm">Оформление заказа</a>
+<hr>
+
+<!-- API /check -->
+<h3>Проверить заказ</h3>
+<form action="/api/order/check" method="post">
+    <div class="input-field">
+        <input id="email" name="email" type="text" class="validate" required>
+        <label for="email">email</label>
+        <span class="helper-text" data-error="Введите email"></span>
+    </div>
+
+    <div class="input-field">
+        <input id="orderId" name="orderId" type="text" class="validate" required>
+        <label for="orderId">ID заказа</label>
+        <span class="helper-text" data-error="Введите ID"></span>
+    </div>
+
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+
+    <button class="btn btn-primary">Проверить</button>
+</form>
+<hr>
+
+<!-- API /setStatus -->
+<h3>Установить статус заказа</h3>
+<form action="/api/order/setStatus" method="post">
+    <div class="input-field">
+        <input id="status" name="status" type="text" class="validate" required>
+        <label for="status">Статус</label>
+        <span class="helper-text" data-error="Введите статус"></span>
+    </div>
+
+    <div class="input-field">
+        <input id="s_id" name="id" type="text" class="validate" required>
+        <label for="s_id">ID заказа</label>
+        <span class="helper-text" data-error="Введите ID"></span>
+    </div>
+
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+
+    <button class="btn btn-primary">Установить</button>
+</form>
+<hr>
+
+<!-- API /admin/allByEmail/:email -->
+<H3>Все заказы по Email:</H3>
+<form action="/api/order/admin/allByEmail" method="post">
+    <div class="input-field">
+        <input id="email" name="email" type="text" class="validate" required>
+        <label for="email">email</label>
+        <span class="helper-text" data-error="Введите email"></span>
+    </div>
+
+    <input type="hidden" name="_csrf" value="{{csrf}}">
+
+    <button class="btn btn-primary">Проверить</button>
+</form>
+<hr>
+
+
+<!-- ->API /readAll -->
+<a href="/admin/allOrders">ВСЕ заказы</a>
+<hr>

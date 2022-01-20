@@ -1,0 +1,19 @@
+{{#if isAdm}}
+
+{{/if}}
+
+{{#if collectionsViewModel.length}}
+    {{#each collectionsViewModel}}
+        <div>Имя: {{name}}</div>
+        <div>Описание: {{description}}</div>
+        <div>Картинки: {{image}}</div>
+        <ul>
+            {{#each products}}
+                <li>Товар: {{this.productId}}</li>
+            {{/each}}
+        </ul>
+        <a href="/admin/editCollection/{{_id}}">Изменить</a>
+        <a href="/admin/deleteCollection/{{_id}}">Удалить</a>
+        <hr>
+    {{/each}}
+{{/if}}

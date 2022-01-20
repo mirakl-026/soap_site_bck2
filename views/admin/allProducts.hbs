@@ -1,0 +1,14 @@
+{{#if isAdm}}
+    {{#if productsViewModel.length}}
+        {{#each productsViewModel}}
+            <div>Имя: {{name}}</div>
+            <div>Коллекция: {{collectionId}}</div>
+            <div>Цена: {{price}}</div>
+            <div>Описание: {{description}}</div>
+            <div>Активен: {{isActive}}</div>
+            <a href="/admin/editProduct/{{_id}}">Изменить</a>
+            <a href="/admin/deleteProduct/{{_id}}">Удалить</a>
+            <hr>
+        {{/each}}
+    {{/if}}
+{{/if}}

@@ -1,0 +1,18 @@
+<!-- Все заказы -->
+{{#if ordersVM}}
+    {{#if ordersVM.length}}
+        {{#each ordersVM}}
+            <ul>
+                <li>Корзина: {{this.items}}</li>
+                <li>Статус: {{this.status}}</li>
+                <li>Email: {{this.email}}</li>
+                <li>Имя: {{this.name}}</li>
+                <li>Телефон: {{this.phone}}</li>
+                <li>Адрес: {{this.address}}</li>
+                <li>Дата: {{this.date}}</li>
+            </ul>
+            <a href="/admin/deleteOrder/{{this._id}}">Удалить</a>
+            <hr>
+        {{/each}}
+    {{/if}}
+{{/if}}

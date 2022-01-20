@@ -1,0 +1,16 @@
+{{#if isAdm}}
+
+{{/if}}
+
+{{#if salesViewModel.length}}
+    {{#each salesViewModel}}
+        <div>Имя: {{saleName}}</div>
+        <div>Описание: {{saleDescription}}</div>
+        <div>Тип скидки: {{saleType}}</div>
+        <div>Значение скидки: {{saleValue}}</div>
+
+        <a href="/admin/editSale/{{_id}}">Изменить</a>
+        <a href="/admin/deleteSale/{{_id}}">Удалить</a>
+        <hr>
+    {{/each}}
+{{/if}}

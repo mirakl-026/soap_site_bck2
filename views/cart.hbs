@@ -1,0 +1,433 @@
+<a href="/">Soap-HBS</a>
+<!-- Оформление заказа -->
+
+<!--Отображение содержимого корзины    -->
+<div class="cart_body">
+    <ul class="shop_items">
+
+    </ul>
+</div>
+
+<!-- Форма отправки на сервер -->
+<div class="main_form_cart" style="display: none">
+    <button type="button" class="btn_cart_clear">Очистить корзину</button>
+    <hr>
+
+    <form action="/api/order/confirmOrder" method="POST">
+        <div class="input-field">
+            <input id="email" name="email" type="text" class="validate" required>
+            <label for="email">Email: </label>
+            <span class="helper-text" data-error="Введите ваш email"></span>
+        </div>
+
+
+        <div class="input-field">
+            <input id="name" name="name" type="text" class="validate" value="">
+            <label for="name">Имя: </label>
+            <span class="helper-text" data-error="Введите имя"></span>
+        </div>
+
+        <div class="input-field">
+            <input id="phone" name="phone" type="text" class="validate" required>
+            <label for="phone">Телефон:</label>
+            <span class="helper-text" data-error="Введите номер телефона"></span>
+        </div>
+
+        <div class="input-field">
+            <input id="address" name="address" type="text" class="validate" value="">
+            <label for="address">Адрес: </label>
+            <span class="helper-text" data-error="Введите ваш адрес"></span>
+        </div>
+
+
+        <input class="main_form_cart_input" type="hidden" name="cart" value="">
+
+        <input type="hidden" name="_csrf" value="{{csrf}}">
+
+        <button id="confirmOrder" class="btn btn-primary" type="submit">Оформить заказ</button>
+    </form>
+</div>
+
+<script>
+    let cart_body_elem = document.querySelector(".cart_body");
+    const ul_elem = document.querySelector(".shop_items");
+
+    let formCart = document.querySelector(".main_form_cart");
+    let formCart_input = document.querySelector(".main_form_cart_input");
+    const btn_clear = document.querySelector(".btn_cart_clear");
+    const btn_confirmOrder = document.querySelector("#confirmOrder");
+
+    btn_confirmOrder.addEventListener("click", event => {
+        clearCart();
+    });
+
+    btn_clear.addEventListener("click", event => {
+        clearCart();
+    });
+
+    // объект корзины
+    let cartObject = {items:[]};
+
+    let isAuthorized = false;
+
+    initCart();
+    checkForAcc();
+    refreshFormCart();
+
+    // скрип AJAX обновления содержимого
+    function initCart() {
+        // считать всё из LS
+        cartFromLocalStorage();
+
+        // если LS не пустой, создать список и добавить все позиции
+        let fullPrice = 0;
+        if(cartObject && cartObject.items.length){
+
+            for (let item of cartObject.items) {
+                const li_elem = document.createElement("li");
+                li_elem.setAttribute("class", "shop_item");
+
+                let mainDiv = document.createElement("div");
+
+                let divName = document.createElement("div");
+                divName.innerHTML = "Название " + item.productName;
+
+                let divPrice = document.createElement("div");
+                divPrice.innerHTML = "Стоимость " + item.productPrice;
+                fullPrice += Number.parseInt(item.productPrice) * item.count;
+
+                let divCount = document.createElement("div");
+                divCount.innerHTML = "Количество " + item.count;
+
+                let btnPlus = document.createElement("button");
+                btnPlus.setAttribute("data-id", item.productId);
+                btnPlus.setAttribute("data-name", item.productName);
+                btnPlus.setAttribute("data-price", item.productPrice);
+                btnPlus.setAttribute("type", "button");
+                btnPlus.innerHTML = "+";
+
+                let btnMinus = document.createElement("button");
+                btnMinus.setAttribute("data-id", item.productId);
+                btnMinus.setAttribute("data-name", item.productName);
+                btnMinus.setAttribute("data-price", item.productPrice);
+                btnMinus.setAttribute("type", "button");
+                btnMinus.innerHTML = "-";
+
+                let hr = document.createElement("hr");
+
+                mainDiv.appendChild(divName);
+                mainDiv.appendChild(divPrice);
+                mainDiv.appendChild(divCount);
+                mainDiv.appendChild(btnPlus);
+                mainDiv.appendChild(btnMinus);
+                mainDiv.appendChild(hr);
+
+                li_elem.appendChild(mainDiv);
+
+                ul_elem.appendChild(li_elem);
+            }
+
+            let divFullPrice = document.createElement("div");
+            divFullPrice.setAttribute("class", "full_cart_price");
+            divFullPrice.innerHTML = "Общая стоимость: " + fullPrice.toString();
+
+            cart_body_elem.appendChild(divFullPrice);
+            enableFormCart();
+            refreshFormCart();
+        }
+        // если LS пустой, то просто отобразить корзина пуста
+        else {
+            const empty_div = document.createElement("div");
+            empty_div.innerHTML = "Корзина пуста";
+            cart_body_elem.appendChild(empty_div);
+            disableFormCart();
+        }
+    }
+
+    function refreshCartData() {
+        ul_elem.innerHTML = ""; // удаление всех элементов
+
+        let oldPrice = document.querySelector(".full_cart_price");
+        cart_body_elem.removeChild(oldPrice);
+
+        // считать всё из LS
+        cartFromLocalStorage();
+
+        // если LS не пустой, создать список и добавить все позиции
+        let fullPrice = 0;
+
+        if (cartObject && cartObject.items.length) {
+            for (let item of cartObject.items) {
+                const li_elem = document.createElement("li");
+                li_elem.setAttribute("class", "shop_item");
+
+                let mainDiv = document.createElement("div");
+
+                let divName = document.createElement("div");
+                divName.innerHTML = "Название " + item.productName;
+
+                let divPrice = document.createElement("div");
+                divPrice.innerHTML = "Стоимость " + item.productPrice;
+                fullPrice += Number.parseInt(item.productPrice) * item.count;
+
+                let divCount = document.createElement("div");
+                divCount.innerHTML = "Количество " + item.count;
+
+                let btnPlus = document.createElement("button");
+                btnPlus.setAttribute("data-id", item.productId);
+                btnPlus.setAttribute("data-name", item.productName);
+                btnPlus.setAttribute("data-price", item.productPrice);
+                btnPlus.setAttribute("type", "button");
+                btnPlus.innerHTML = "+";
+
+                let btnMinus = document.createElement("button");
+                btnMinus.setAttribute("data-id", item.productId);
+                btnMinus.setAttribute("data-name", item.productName);
+                btnMinus.setAttribute("data-price", item.productPrice);
+                btnMinus.setAttribute("type", "button");
+                btnMinus.innerHTML = "-";
+
+                let hr = document.createElement("hr");
+
+                mainDiv.appendChild(divName);
+                mainDiv.appendChild(divPrice);
+                mainDiv.appendChild(divCount);
+                mainDiv.appendChild(btnPlus);
+                mainDiv.appendChild(btnMinus);
+                mainDiv.appendChild(hr);
+
+                li_elem.appendChild(mainDiv);
+
+                ul_elem.appendChild(li_elem);
+            }
+
+            let divFullPrice = document.createElement("div");
+            divFullPrice.setAttribute("class", "full_cart_price");
+            divFullPrice.innerHTML = "Общая стоимость: " + fullPrice.toString();
+
+            cart_body_elem.appendChild(divFullPrice);
+            enableFormCart();
+            refreshFormCart();
+        } else {
+            const empty_div = document.createElement("div");
+            empty_div.innerHTML = "Корзина пуста";
+            cart_body_elem.appendChild(empty_div);
+            disableFormCart();
+        }
+    }
+
+    ul_elem.addEventListener("click", event => {
+        //console.log(event.target.type);
+        if (event.target.type === "button") {
+            let itemId = event.target.dataset.id;
+            let itemName = event.target.dataset.name;
+            let itemPrice = event.target.dataset.price;
+
+            if(event.target.innerHTML === "+") {
+                // +
+                console.log("+", itemId);
+                addToCart(itemId, itemName, itemPrice);
+                refreshCartData();
+                if (isAuthorized === true)
+                    syncCart();
+            } else {
+                // -
+                console.log("-", itemId);
+                removeFromCart(itemId);
+                refreshCartData();
+                if (isAuthorized === true)
+                    syncCart();
+            }
+        }
+        // console.log(id);
+    });
+
+
+    function addToCart (itemId) {
+        let idx = cartObject.items.map(p => p.productId).indexOf(itemId);
+        if (idx >= 0) {
+            // ++
+            cartObject.items[idx].count++;
+        } else {
+            cartObject.items.push({
+                productId: itemId,
+                count: 1
+            });
+        }
+        cartToLocalStorage();
+    }
+
+    function removeFromCart (itemId) {
+        let idx = cartObject.items.map(p => p.productId).indexOf(itemId);
+        if (idx >= 0) {
+            // --
+            if (cartObject.items[idx].count === 1) {
+                cartObject.items = cartObject.items.filter(p => p.productId !== itemId);
+            } else {
+                cartObject.items[idx].count--;
+            }
+        }
+        cartToLocalStorage();
+    }
+
+    function cartToLocalStorage() {
+        localStorage.setItem("cart", JSON.stringify(cartObject));
+    }
+
+    function cartFromLocalStorage() {
+        cartObject = JSON.parse(localStorage.getItem("cart"));
+    }
+
+
+
+
+    function enableFormCart() {
+        formCart.setAttribute("style", "");
+    }
+
+    function disableFormCart() {
+        formCart.setAttribute("style", "display: none");
+    }
+
+    function refreshFormCart() {
+        let newCart = {items:[]};
+        for (let item of cartObject.items) {
+            newCart.items.push({
+                product: {
+                    name: item.productName,
+                    price: item.productPrice
+                },
+                count: item.count
+            })
+        }
+
+        formCart_input.setAttribute("value", JSON.stringify(newCart));
+        //formCart_input.setAttribute("value", JSON.stringify(cartObject));
+    }
+
+
+    function checkForAcc() {
+        console.log("checkForAcc");
+        let result;
+
+        // проверка на авторизацию
+        const url = "http://localhost:3000/auth/checkIsAuth"; // по которму получим JSON
+
+        // есть много асинхронных запросов, но сейчас лучше так:
+        fetch(url)
+                .then(function(response) {
+                    return response.json()
+                })
+                .then(function (data){
+                    // console.log(data);
+                    result = data.isAccount;
+                    console.log("auth:", result);
+                    isAuthorized = data.isAccount;
+                    if (isAuthorized === true) {
+                        cartFromDB();
+                        //syncCart();
+
+                        fillCartForm();
+                    }
+                });
+    }
+
+
+    function cartFromDB() {
+        let db_cartObject;
+        let result;
+
+        const url = "http://localhost:3000/api/account/readCart"; // получить корзину JSON
+
+        // есть много асинхронных запросов, но сейчас лучше так:
+        fetch(url)
+                .then(function(response) {
+                    return response.json()
+                })
+                .then(function (data){
+                    // console.log(data);
+                    result = data;
+                    console.log(result);
+                    cartObject = {items:[]};
+
+                    db_cartObject = data;
+
+                    // добавить к текущей корзине данные из БД
+                    for (let item of db_cartObject.items) {
+                        let idx = cartObject.items.map(p => p.productId).indexOf(item.productId);
+                        if (idx >= 0) {
+                            // ++
+                            cartObject.items[idx].count++;
+                        } else {
+                            cartObject.items.push({
+                                productId: item.productId,
+                                productName: item.productName,
+                                productPrice: item.productPrice,
+                                count: item.count
+                            });
+                        }
+                    }
+                    cartToLocalStorage();
+                });
+    }
+
+    function syncCart() {
+        const url = "http://localhost:3000/api/account/sendCart"; // получить корзину JSON
+
+        const data = JSON.stringify(cartObject);
+
+        fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'X-XSRF-TOKEN': csrf,
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+            body: data// body data type must match "Content-Type" header
+
+        }).then(function(response) {
+            return response.json()
+        }).then(function (data){
+
+        });
+    }
+
+    function clearCart() {
+        cartObject = {items:[]};
+        cartToLocalStorage();
+        refreshCartData();
+        if (isAuthorized === true)
+            syncCart();
+    }
+
+    function fillCartForm() {
+        let result;
+        const url = "http://localhost:3000/api/account/get/meta"; // получить корзину JSON
+
+        // есть много асинхронных запросов, но сейчас лучше так:
+        fetch(url)
+                .then(function(response) {
+                    return response.json()
+                })
+                .then(function (data){
+                    // console.log(data);
+                    result = data;
+                    console.log("accMeta: " , result);
+
+                    let elem_buyerEmail = document.querySelector("#email");
+                    elem_buyerEmail.value = result.email;
+
+                    let elem_buyerName = document.querySelector("#name");
+                    elem_buyerName.value = result.name;
+                });
+    }
+
+</script>
+
+
+

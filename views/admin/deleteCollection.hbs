@@ -1,0 +1,22 @@
+{{#if isAdm}}
+    {{#if collectionViewModel}}
+        <div>{{collectionViewModel.name}}</div>
+        <div>{{collectionViewModel.description}}</div>
+        <div>{{collectionViewModel.image}}</div>
+        <ul>
+            {{#each collectionViewModel.products}}
+                <li>{{this}}</li>
+            {{/each}}
+        </ul>
+        <hr>
+        <form action="/api/collection/delete/" method="post">
+
+            <input type="hidden" name="_id" value="{{collectionViewModel._id}}">
+
+            <input type="hidden" name="_csrf" value="{{csrf}}">
+
+            <button class="btn btn-primary" type="submit">Удалить коллекцию</button>
+
+        </form>
+    {{/if}}
+{{/if}}

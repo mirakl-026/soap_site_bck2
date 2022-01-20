@@ -1,0 +1,153 @@
+<a href="/">Soap-HBS</a>
+
+<h1>Склад</h1>
+
+<h2>Все товары</h2>
+{{#if stockViewModel}}
+    <ul class="stock_items">
+        {{#each stockViewModel.products}}
+            <li class="stock_item">
+                <div>
+                    <div>Id: {{this.productId}}</div>
+                    <div>Количество: {{this.quantity}}</div>
+                </div>
+
+                <button data-id="{{this.productId}}" data-csrf="{{@root.csrf}}" type="button">++</button>
+                <button data-id="{{this.productId}}" data-csrf="{{@root.csrf}}" type="button">--</button>
+                <button data-id="{{this.productId}}" data-csrf="{{@root.csrf}}" type="button">CLR</button>
+
+                <!-- setVal -->
+                <form action="/api/stock/setProduct" method="POST">
+                    <input name="value" type="number" min="1" required>
+                    <input type="hidden" name="id" value="{{this.productId}}">
+                    <input type="hidden" name="_csrf" value="{{@root.csrf}}">
+                    <button class="btn btn-primary">SV</button>
+                </form>
+
+                <!-- setVal -->
+                <form action="/api/stock/increaseProduct" method="POST">
+                    <input name="value" type="number" min="1" required>
+                    <input type="hidden" name="id" value="{{this.productId}}">
+                    <input type="hidden" name="_csrf" value="{{@root.csrf}}">
+                    <button class="btn btn-primary">+V</button>
+                </form>
+
+                <!-- setVal -->
+                <form action="/api/stock/decreaseProduct" method="POST">
+                    <input name="value" type="number" min="1" required>
+                    <input type="hidden" name="id" value="{{this.productId}}">
+                    <input type="hidden" name="_csrf" value="{{@root.csrf}}">
+                    <button class="btn btn-primary">-V</button>
+                </form>
+                <hr>
+            </li>
+        {{/each}}
+    </ul>
+{{/if}}
+
+
+
+<script>
+    const ul_elem = document.querySelector(".stock_items");
+
+    ul_elem.addEventListener("click", event => {
+        //console.log(event.target.type);
+        if (event.target.type === "button") {
+            let itemId = event.target.dataset.id;
+            let csrf = event.target.dataset.csrf;
+
+            if(event.target.innerHTML === "++") {
+                // +
+                console.log("++", itemId);
+                stock_increment(itemId, csrf);
+
+            }
+            else if (event.target.innerHTML === "--"){
+                // -
+                console.log("--", itemId);
+                stock_decrement(itemId, csrf);
+            }
+            else if (event.target.innerHTML === "CLR") {
+                // reset
+                console.log("reset: ", itemId);
+                stock_reset(itemId, csrf);
+            }
+
+        }
+        // console.log(id);
+    });
+
+
+
+
+    // если авторизован - то работа с корзиной через БД
+    function stock_increment(itemId, csrf) {
+        const url = "http://localhost:3000/api/stock/incrementProduct/" + itemId;
+
+        fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'X-XSRF-TOKEN': csrf,
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+
+        }).then(function(response) {
+            return response.json()
+        }).then(function (data){
+
+        });
+    }
+
+    function stock_decrement(itemId, csrf) {
+        const url = "http://localhost:3000/api/stock/decrementProduct/" + itemId;
+
+        fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'X-XSRF-TOKEN': csrf,
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+
+        }).then(function(response) {
+            return response.json()
+        }).then(function (data){
+
+        });
+    }
+
+    function stock_reset(itemId, csrf) {
+        const url = "http://localhost:3000/api/stock/resetProduct/" + itemId;
+
+        fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'X-XSRF-TOKEN': csrf,
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+
+        }).then(function(response) {
+            return response.json()
+        }).then(function (data){
+
+        });
+    }
+
+</script>

@@ -1,0 +1,29 @@
+<div class="auth">
+    <div id="login">
+        <h1>Администратор</h1>
+        <div>admin_v101@feellab.ru</div>
+
+        <form action="/auth/admin/login" method="POST">
+            <div>
+                <input id="email" name="email" type="email" class="validate" required>
+                <label for="email">Email</label>
+                <span data-error="Введите email"></span>
+            </div>
+            <div>
+                <input id="password" name="password" type="password" class="validate">
+                <label for="password">Пароль</label>
+                <span data-error="Введите пароль"></span>
+            </div>
+            <div>
+                <input id="wordv2" name="wordv2" type="password" class="validate">
+                <label for="wordv2">Доп.слово</label>
+                <span data-error="Введите email"></span>
+            </div>
+
+            <input type="hidden" name="_csrf" value="{{csrf}}">
+
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+    <hr>
+</div>

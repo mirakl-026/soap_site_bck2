@@ -1,0 +1,272 @@
+<a href="/">Soap-HBS</a>
+
+<h1>Магазин</h1>
+
+<h3>Корзина</h3>
+<h4><a href="/cart">Оформить заказ</a></h4>
+<div class="cart_itemsCount">Всего товаров: </div>
+<div class="cart_fullPrice">на сумму: </div>
+<button type="button" class="btn_cart_clear">Очистить корзину</button>
+
+
+<h2>Все товары</h2>
+{{#if allProductsViewModel.length}}
+    <ul class="shop_items">
+        {{#each allProductsViewModel}}
+            <li class="shop_item">
+                <div>
+                    <div>Название: {{this.name}}</div>
+                    <div>Коллекция: {{this.collectionName}}</div>
+                    <div>Стоимость: {{this.price}}</div>
+                    <div>Описание: {{this.description}}</div>
+                </div>
+                <button data-id="{{this._id}}" data-name="{{this.name}}" data-price="{{this.price}}" type="button">+</button>
+                <button data-id="{{this._id}}" data-name="{{this.name}}" data-price="{{this.price}}" type="button">-</button>
+                <hr>
+            </li>
+        {{/each}}
+    </ul>
+{{/if}}
+
+
+
+<script>
+    /*
+        Объект корзины выглядит следующим образом:
+            cart: {
+                items: [
+                    {
+                        productId: Id_товара,
+                        productName: название,  //
+                        productPrice: цена,     // - это нужно для анонимной корзины
+                        count: кол-во,
+                    }
+                ]
+            },
+     */
+    const cart_itemsCount = document.querySelector(".cart_itemsCount");
+    const cart_fullPrice = document.querySelector(".cart_fullPrice");
+    const ul_elem = document.querySelector(".shop_items");
+    const btn_clear = document.querySelector(".btn_cart_clear");
+
+    let isAuthorized = false;
+
+    let cartObject = {items:[]};
+
+    checkForCart();
+    checkForAcc();
+    updateCartIndicator();
+
+    function checkForCart() {
+        console.log("checkForCart");
+        let cart = localStorage.getItem("cart");
+        if (cart) {
+            // корзина есть в LS - загружаем в объект
+            cartFromLocalStorage();
+            console.log("there is cart: ", cartObject);
+        } else {
+            // корзины нет , надо создать в LS
+            console.log("no cart");
+            cartToLocalStorage();
+        }
+    }
+
+    function checkForAcc() {
+        console.log("checkForAcc");
+        let result;
+
+        // проверка на авторизацию
+        const url = "http://localhost:3000/auth/checkIsAuth"; // по которму получим JSON
+
+        // есть много асинхронных запросов, но сейчас лучше так:
+        fetch(url)
+                .then(function(response) {
+                    return response.json()
+                })
+                .then(function (data){
+                    // console.log(data);
+                    result = data.isAccount;
+                    console.log("auth:", result);
+                    isAuthorized = data.isAccount;
+
+                    console.log("startSync");
+                    if (isAuthorized === true) {
+                        cartFromDB();
+                        //syncCart();
+                    }
+                });
+    }
+
+
+    ul_elem.addEventListener("click", event => {
+        //console.log(event.target.type);
+        if (event.target.type === "button") {
+            let itemId = event.target.dataset.id;
+            let itemName = event.target.dataset.name;
+            let itemPrice = event.target.dataset.price;
+
+            if(event.target.innerHTML === "+") {
+                // +
+                console.log("+", itemId);
+                addToCart(itemId, itemName, itemPrice);
+                updateCartIndicator();
+                if (isAuthorized === true)
+                    syncCart();
+            } else {
+                // -
+                console.log("-", itemId);
+                removeFromCart(itemId);
+                updateCartIndicator();
+                if (isAuthorized === true)
+                    syncCart();
+            }
+        }
+        // console.log(id);
+    });
+
+    btn_clear.addEventListener("click", event => {
+       clearCart();
+    });
+
+
+
+
+
+
+    // проверка на есть ли в локалстораже уже объект корзины
+    function addToCart (itemId, itemName, itemPrice) {
+        let idx = cartObject.items.map(p => p.productId).indexOf(itemId);
+        if (idx >= 0) {
+            // ++
+            cartObject.items[idx].count++;
+        } else {
+            cartObject.items.push({
+                productId: itemId,
+                productName: itemName,
+                productPrice: itemPrice,
+                count: 1
+            });
+        }
+        cartToLocalStorage();
+    }
+
+    function removeFromCart (itemId) {
+        let idx = cartObject.items.map(p => p.productId).indexOf(itemId);
+        if (idx >= 0) {
+            // --
+            if (cartObject.items[idx].count === 1) {
+                cartObject.items = cartObject.items.filter(p => p.productId !== itemId);
+            } else {
+                cartObject.items[idx].count--;
+            }
+        }
+        cartToLocalStorage();
+    }
+
+    function cartToLocalStorage() {
+        localStorage.setItem("cart", JSON.stringify(cartObject));
+    }
+
+    function cartFromLocalStorage() {
+        cartObject = JSON.parse(localStorage.getItem("cart"));
+    }
+
+
+
+
+
+    // если авторизован - то работа с корзиной через БД
+
+    function cartFromDB() {
+        let db_cartObject;
+        let result;
+
+        const url = "http://localhost:3000/api/account/readCart"; // получить корзину JSON
+
+        // есть много асинхронных запросов, но сейчас лучше так:
+        fetch(url)
+                .then(function(response) {
+                    return response.json()
+                })
+                .then(function (data){
+                    // console.log(data);
+                    result = data;
+                    console.log(result);
+                    cartObject = {items:[]};
+
+                    db_cartObject = data;
+
+                    // добавить к текущей корзине данные из БД
+                    for (let item of db_cartObject.items) {
+                        let idx = cartObject.items.map(p => p.productId).indexOf(item.productId);
+                        if (idx >= 0) {
+                            // ++
+                            cartObject.items[idx].count++;
+                        } else {
+                            cartObject.items.push({
+                                productId: item.productId,
+                                productName: item.productName,
+                                productPrice: item.productPrice,
+                                count: item.count
+                            });
+                        }
+                    }
+                    cartToLocalStorage();
+                    updateCartIndicator();
+                });
+    }
+
+    function syncCart() {
+        const url = "http://localhost:3000/api/account/sendCart"; // получить корзину JSON
+
+        const data = JSON.stringify(cartObject);
+
+        fetch(url, {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, *cors, same-origin
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            credentials: 'same-origin', // include, *same-origin, omit
+            headers: {
+                'X-XSRF-TOKEN': csrf,
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            redirect: 'follow', // manual, *follow, error
+            referrerPolicy: 'no-referrer', // no-referrer, *client
+            body: data// body data type must match "Content-Type" header
+
+        }).then(function(response) {
+            return response.json()
+        }).then(function (data){
+
+        });
+    }
+
+
+    function updateCartIndicator () {
+        if (cartObject.items.length) {
+            let allCount = cartObject.items.map(i => i.count).reduce((total, c) => {
+                return total += c
+            },0);
+            let allPrice = cartObject.items.map(i => parseInt(i.productPrice) * parseInt(i.count)).reduce((total, price) => {
+                return total += price
+            },0);
+
+            cart_itemsCount.innerHTML = "Всего товаров: " + allCount;
+            cart_fullPrice.innerHTML = allPrice.toString() + " руб.";
+        } else {
+            cart_itemsCount.innerHTML = "Всего товаров: 0";
+            cart_fullPrice.innerHTML = " ";
+        }
+    }
+    
+    function clearCart() {
+        cartObject = {items:[]};
+        cartToLocalStorage();
+        updateCartIndicator();
+        if (isAuthorized === true)
+            syncCart();
+    }
+
+
+</script>

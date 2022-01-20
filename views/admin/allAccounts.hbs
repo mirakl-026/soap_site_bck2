@@ -1,0 +1,18 @@
+{{#if isAdm}}
+    {{#if accountsViewModel.length}}
+        {{#each accountsViewModel}}
+            <div>{{email}}</div>
+            <div>{{name}}</div>
+<!--            <div>{{password}}</div>-->
+            <div><a href="/admin/oneAccount/{{_id}}">Детально</a></div>
+            <div><a href="/admin/editAccount/{{_id}}">Редактировать</a></div>
+
+            <form action="/api/account/delete/" method="post">
+                <input type="hidden" name="_id" value="{{_id}}">
+                <input type="hidden" name="_csrf" value="{{@root.csrf}}">
+                <button class="btn btn-primary" type="submit">Удалить</button>
+            </form>
+            <hr>
+        {{/each}}
+    {{/if}}
+{{/if}}

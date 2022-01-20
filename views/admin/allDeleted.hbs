@@ -1,0 +1,15 @@
+{{#if isAdm}}
+
+{{/if}}
+
+{{#if allDesVM.length}}
+    {{#each allDesVM}}
+        <div>Имя: {{entityType}}</div>
+        <div>Описание: {{deletedObjectId}}</div>
+        <div>Тип скидки: {{entityPropsJSON}}</div>
+
+        <a href="/admin/recoverDeleted/{{_id}}">Восстановить</a>
+        <a href="/admin/deleteDeleted/{{_id}}">Удалить окончательно</a>
+        <hr>
+    {{/each}}
+{{/if}}
