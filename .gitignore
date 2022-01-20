@@ -1,0 +1,18 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+/node_modules
+/.idea
+
+/keys
+
+package-lock.json
+/package-lock.json
+
+/public/images
+
+/backup
+
+/logs
