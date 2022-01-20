@@ -1,9 +1,6 @@
-const {Schema, model} = require("mongoose");
+// альт картинки
 
-const imageAltSchema = new Schema({
-    i_path: String,
-
-    i_alt: String,
-});
-
-module.exports = model("ImageAlt", imageAltSchema);
+module.exports = class ImageAlt{
+    i_path;     // string
+    i_alt;      // string
+};

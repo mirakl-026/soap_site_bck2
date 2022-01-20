@@ -1,58 +1,23 @@
 // модель пользователя
 
-const {Schema, model} = require("mongoose");
+module.exports = class Account {
+    // _id;         // Mongodb.ObjectId
+    email;          // string, required
+    name;           // string, required
+    password;       // string, required 
+    verified;       // boolean, required
+    emailToken;     // string
+    emailTokenExp;  // Date
+    resetToken;     // string
+    resetTokenExp;  // Date
+    cartItems;      // [] of { productId: Mongodb.ObjectId - ref "Product", count: number} 
+    orders;         // [] of { orderdId: Mongodb.ObjectId - ref "Order" }
+    wishlist;       // [] of { productId: Mongodb.ObjectId - ref "Product" }
 
-const accountSchema = new Schema({
-    email: {
-        type: String,
-        required: true
-    },
-    name: {
-        type: String,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    verified: {
-        type: Boolean,
-        required: true
-    },
-    emailToken: String,
-    emailTokenExp: Date,
-    resetToken: String,
-    resetTokenExp: Date,
-    cartItems: [
-        {
-            _id: false,
-            productId: {
-                type: Schema.Types.ObjectId,
-                ref: "Product",
-            },
-            count: {
-                type: Number,
-            }
-        }
-    ],
-    orders: [
-        {
-            _id: false,
-            orderId: {
-                type: Schema.Types.ObjectId,
-                ref: "Order"
-            }
-        }
-    ],
-    wishlist: [
-        {
-            _id: false,
-            productId: {
-                type: Schema.Types.ObjectId,
-                ref: "Product",
-            }
-        }
-    ]
-});
-
-module.exports = model("Account", accountSchema);
+    constructor (email, name, password) {
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.verified = false;
+    }
+};

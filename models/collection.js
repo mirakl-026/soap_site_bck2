@@ -1,52 +1,24 @@
-const {Schema, model} = require("mongoose");
+// модель коллекции / категории
 
-const collectionSchema = new Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    description: {
-        type: String
-    },
-    isActive: {
-        type: Boolean
-    },
-    parentId: {
-        type: Schema.Types.ObjectId,
-        ref: "Collection"
-    },
-    childIds:[
-        {
-            _id: false,
-            childId: {
-                type: Schema.Types.ObjectId,
-                ref: "Collection"
-            }
-        }
-    ],
-    image: {
-        _id: false,
-        url: String,
-        alt: String
-    },
-    products: [
-        {
-            _id: false,
-            productId: {
-                type: Schema.Types.ObjectId,
-                ref: "Product"
-            }
-        }
-    ],
-    sales: [
-        {
-            _id: false,
-            saleId: {
-                type: Schema.Types.ObjectId,
-                ref: "Sale"
-            }
-        }
-    ],
-});
+module.exports = class Collection{
+    // _id;         // Mongodb.ObjectId
+    name;           // string, required
+    description;    // string
+    isActive;       // boolean, required
+    parentId;       // Mongodb.ObjectId - ref "Collection"
+    childIds;       // [] of { childId: Mongodb.ObjectId - ref "Collection" }
+    image;          // { url: string, alt: string }
+    products;       // [] of { productId: Mongodb.ObjectId - ref "Product" }
+    sales;          // [] of { saleId: Mongodb.ObjectId - ref "Sale" }
 
-module.exports = model("Collection", collectionSchema);
+    constructor (name, description, isActive, parentId, image) {
+        this.name = name;
+        this.description = description;
+        this.isActive = isActive;
+        this.parentId = parentId;
+        this.image = {
+            url: image.url,
+            alt: image.alt
+        };
+    };
+};
