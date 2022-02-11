@@ -1,10 +1,13 @@
-// мета-настройки работы сайта, так-же как и склад - синглтон
+// мета-настройки работы сайта, так-же как и склад - скинглтон
+const {Schema, model} = require("mongoose");
 
-module.exports = class Meta{
-    isEmails;   // boolean
-    isLog;      // boolean
-    isBackup;   // boolean
+const metaSchema = new Schema({
+    isEmails: Boolean,
 
-};
+    isLog: Boolean,
 
+    isBackup: Boolean
+});
+
+module.exports = model("Meta", metaSchema);
 

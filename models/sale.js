@@ -1,15 +1,21 @@
 // модель скидки
+const {Schema, model} = require("mongoose");
 
-module.exports = class Sale{
-    saleType;       // string, проценты "percent" или константное число "number"
+const saleSchema = new Schema({
+    saleType: {
+        type: String    // проценты "percent" или константное число "number"
+    },
 
-    saleValue;      // number, число, если процент - то от 1 до 99, если цифра - то больше 0
+    saleValue: {
+        type: Number    // число, если процент - то от 1 до 99, если цифра - то больше 0
+    },
 
-    saleName;       // string, название
-
-    saleDescription;   // string,  описание
-
-    constructor() {
-
+    saleName: {
+        type: String    // название
+    },
+    saleDescription: {
+        type: String    // описание
     }
-};
+});
+
+module.exports = model("Sale", saleSchema);

@@ -1,7 +1,16 @@
 // удалённая сущность (account | collection | order | product | sale)
+const {Schema, model} = require("mongoose");
 
-module.exports = class DeletedEntity{
-    entityType;         // string - account | collection | order | product | sale
-    deletedObjectId;    // Mongodb.Objectid
-    entityPropsJSON;    // string, для разворачивания - JSON.parse
-};
+const deletedEntitySchema = new Schema({
+    entityType: {
+        type: String,   //account | collection | order | product | sale
+    },
+    deletedObjectId: {
+        type: Schema.Types.ObjectId
+    },
+    entityPropsJSON: {
+        type: String,   // для разворачивания - JSON.parse
+    },
+});
+
+module.exports = model("DeletedEntity", deletedEntitySchema);

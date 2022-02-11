@@ -1,13 +1,8 @@
-// модель для хранения HTML статической страницы
+const {Schema, model} = require("mongoose");
 
-module.exports = class StaticPage{
-    pageName;   // string
-    content;    // string
+const staticPageSchema = new Schema({
+    pageName: String,
+    content: String
+});
 
-    constructor() {
-        
-    }
-};
-
-
-
+module.exports = model("StaticPage", staticPageSchema);

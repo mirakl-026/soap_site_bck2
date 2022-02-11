@@ -1,10 +1,18 @@
 // модель склада
+const {Schema, model} = require("mongoose");
 
-module.exports = class Stock{
-    products;   // [] of { productId: Mongodb.ObjectId - ref "Product", quantity: number }
+const stockSchema = new Schema({
+    products: [
+        {
+            _id: false,
+            productId: {
+                type: Schema.Types.ObjectId,
+                ref: "Product",
+                required: true
+            },
+            quantity: Number
+        }
+    ]
+});
 
-    constructor() {
-        
-    }
-};
-
+module.exports = model("Stock", stockSchema);

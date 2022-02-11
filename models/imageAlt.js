@@ -1,6 +1,9 @@
-// альт картинки
+const {Schema, model} = require("mongoose");
 
-module.exports = class ImageAlt{
-    i_path;     // string
-    i_alt;      // string
-};
+const imageAltSchema = new Schema({
+    i_path: String,
+
+    i_alt: String,
+});
+
+module.exports = model("ImageAlt", imageAltSchema);

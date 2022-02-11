@@ -1,19 +1,32 @@
 // модель для хранения данных для поиска
+const {Schema, model} = require("mongoose")
 
-module.exports = class Search{
-    name;  // string, required
+const searchSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
 
-    searchObjectType;  // string, required, может быть либо collection либо product
+    searchObjectType: {
+        type: String,   // может быть либо collection либо product
+        required: true
+    },
 
     // если type = collection, то должно быть поле collectionId, а поле productId пустое (желательно вообще нет)
-    collectionId;  // Mongodb.ObjectId - ref "Collection"
+    collectionId: {
+        type: Schema.Types.ObjectId,
+        ref: "Collection",
+    },
 
     // если type = product, то должно быть поле productId, а поле collectionId пустое (желательно вообще нет)
-    productId;  // Mongodb.ObjectId - ref "Product"
+    productId: {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+    },
 
-    keywords;  // string
+    keywords: {
+        type: String
+    },
+});
 
-    constructor() {
-        
-    }
-};
+module.exports = model("Search", searchSchema);

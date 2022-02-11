@@ -1,8 +1,13 @@
-// файл картинки
+const {Schema, model} = require("mongoose");
 
-module.exports = class ImageFile{
-    i_type;         // string
-    i_fileName;     // string
-    i_path;         // string
-    i_alt;          // string
-};
+const imageFileSchema = new Schema({
+    i_type: String,
+
+    i_fileName: String,
+
+    i_path: String,
+
+    i_alt: String,
+});
+
+module.exports = model("ImageFile", imageFileSchema);

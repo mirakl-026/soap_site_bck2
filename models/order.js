@@ -1,23 +1,49 @@
-// модель заказа
+const {Schema, model} = require("mongoose");
 
-module.exports = class Order{
-    //_id;      // Mongodb.ObjectId
-    name;       // string 
-    email;      // string, required
-    phone;      // string required
-    address;    // string
-    items;      // [] of { product: { name: string, price: number }, count: number }
-    status;     // string
-    cancelled;  // boolean
-    date;       // string, required
+const orderSchema = new Schema({
+    name: {
+        type: String
+    },
 
-    constructor (name, email, phone, address, items, date) {
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.address = address;
-        this.items = items.slice();
-        this.date = date;
-    }
-};
+    email: {
+        type: String,
+        required: true
+    },
 
+    phone: {
+        type: String,
+        required: true
+    },
+
+    address: {
+        type: String
+    },
+
+    items:  [
+            {
+                _id: false,
+                product: {
+                    name: String,
+                    price: Number,
+                },
+                count: {
+                    type: Number,
+                }
+            }
+        ],
+
+    status: {
+        type: String
+    },
+
+    cancelled: {
+        type: Boolean
+    },
+
+    date: {
+        type: String,
+        required:true
+    },
+});
+
+module.exports = model("Order", orderSchema);
