@@ -7,6 +7,7 @@
 /.idea
 
 /keys
+/mail
 
 package-lock.json
 /package-lock.json
