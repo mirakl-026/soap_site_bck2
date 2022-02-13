@@ -4,10 +4,10 @@ const MetaService = require("../../services/mongodb/metaService");
 module.exports.getMeta = async function (req, res) {
     try {
         const meta = await MetaService.getMetaDataFromDB();
-        res.status(200).json(MetaService.createMetaDbViewModel(meta));
+        return res.status(200).json(MetaService.createMetaDbViewModel(meta));
 
     } catch (e) {
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server error"
         });
     }
@@ -25,21 +25,21 @@ module.exports.setEmail = async function (req, res) {
             await meta.save();
             const result = await MetaService.refreshMetaVars();
             if (result) {
-                res.status(200).json({
+                return res.status(200).json({
                     message: "meta vars [emails] changed"
                 });
             } else {
-                res.status(200).json({
+                return res.status(200).json({
                     message: "meta vars [emails] not changed"
                 });
             }
         } else {
-            res.status(200).json({
+            return res.status(200).json({
                 message: "no meta-object in db"
             });
         }
     } catch (e) {
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server error"
         });
     }
@@ -57,22 +57,22 @@ module.exports.setLog = async function (req, res) {
             await meta.save();
             const result = await MetaService.refreshMetaVars();
             if (result) {
-                res.status(200).json({
+                return res.status(200).json({
                     message: "meta vars [log] changed"
                 });
             } else {
-                res.status(200).json({
+                return res.status(200).json({
                     message: "meta vars [log] not changed"
                 });
             }
         } else {
-            res.status(200).json({
+            return res.status(200).json({
                 message: "no meta-object in db"
             });
         }
 
     } catch (e) {
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server error"
         });
     }
@@ -90,22 +90,22 @@ module.exports.setBackup = async function (req, res) {
             await meta.save();
             const result = await MetaService.refreshMetaVars();
             if (result) {
-                res.status(200).json({
+                return res.status(200).json({
                     message: "meta vars [backup] changed"
                 });
             } else {
-                res.status(200).json({
+                return res.status(200).json({
                     message: "meta vars [backup] not changed"
                 });
             }
         } else {
-            res.status(200).json({
+            return res.status(200).json({
                 message: "no meta-object in db"
             });
         }
 
     } catch (e) {
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server error"
         });
     }
