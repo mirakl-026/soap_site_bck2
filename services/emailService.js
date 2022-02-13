@@ -1,4 +1,4 @@
-const keys = require("../keys/keys");
+const mailSettings = require("../mail/mailSettings");
 const nodemailer = require("nodemailer");   //Nodemailer
 let transporter;
 
@@ -6,12 +6,12 @@ let transporter;
 module.exports.initEmailTransport = function () {
     try {
         transporter = nodemailer.createTransport({
-            host: keys.MAIL_HOST.host,
-            port: keys.MAIL_HOST.port,
-            secure: keys.MAIL_HOST.secure, // true for 465, false for other ports
+            host: mailSettings.MAIL_HOST.host,
+            port: mailSettings.MAIL_HOST.port,
+            secure: mailSettings.MAIL_HOST.secure, // true for 465, false for other ports
             auth: {
-                user: keys.MAIL_HOST.auth.user, // generated ethereal user
-                pass: keys.MAIL_HOST.auth.pass, // generated ethereal password
+                user: mailSettings.MAIL_HOST.auth.user, // generated ethereal user
+                pass: mailSettings.MAIL_HOST.auth.pass, // generated ethereal password
             },
         });
         console.log("email transport initialized...");
@@ -22,10 +22,6 @@ module.exports.initEmailTransport = function () {
 
 
 
-
-
-
-
 // Работа с письмами
 // ====================================== регистрация аккаунта =======================================================
 // письмо после регистрации и письмо подтверждения email - объеденены, отдельное подтверждение по истечению срока -
@@ -33,16 +29,16 @@ module.exports.initEmailTransport = function () {
 function getDefaultRegisterEmail(email, token) {
     return {
         to: email,
-        from: keys.EMAIL_FROM,
+        from: mailSettings.EMAIL_FROM,
         subject: "Аккаунт зарегестрирован",
         text: "register email",
         html: `
             <h1>Пользователь ${email} зарегестрирован!</h1>
             <p>Подтвердите свой e-mail — так будет удобнее управлять учётной записью.</p>
-            <p> <a href="${keys.BASE_URL}/auth/confirmAccountEmail/${token}">Подтвердить!</a></p>
+            <p> <a href="${mailSettings.BASE_URL}/auth/confirmAccountEmail/${token}">Подтвердить!</a></p>
             <hr />
             <p>Приятных покупок!</p>
-            <a href="${keys.BASE_URL}">Feel Lab</a>
+            <a href="${mailSettings.BASE_URL}">Feel Lab</a>
         `,
     }
 }
@@ -68,16 +64,16 @@ module.exports.sendEmail_AccountRegistered = async function (email, token) {
 function getDefaultConfirmEmail(email, token) {
     return {
         to: email,
-        from: keys.EMAIL_FROM,
+        from: mailSettings.EMAIL_FROM,
         subject: "Подтверждение email",
         text: "confirm email",
         html:  `
             <h1>Подтверждение email</h1>
             <p>Подтвердите свой e-mail — так будет удобнее управлять учётной записью.</p>
-            <p> <a href="${keys.BASE_URL}/confirmAccountEmail/${token}">Подтвердить!</a></p>
+            <p> <a href="${mailSettings.BASE_URL}/confirmAccountEmail/${token}">Подтвердить!</a></p>
 
             <hr />
-            <a href="${keys.BASE_URL}">Feel Lab</a>
+            <a href="${mailSettings.BASE_URL}">Feel Lab</a>
         `,
     }
 }
@@ -104,17 +100,17 @@ module.exports.sendEmail_ConfirmRegisteredEmail = async function (email, token) 
 function getDefaultResetPasswordEmail (email, token) {
     return {
         to: email,
-        from: keys.EMAIL_FROM,
+        from: mailSettings.EMAIL_FROM,
         subject: "Изменение пароля",
         text: "reset password",
         html:  `
             <h1>Вы хотите изменить пароль?</h1>
             <p>Если нет, то проигнорируйте данное письмо</p>
             <p>Иначе нажмите на ссылку ниже:</p>
-            <p> <a href="${keys.BASE_URL}/resetPasswordS2/${token}">Изменить пароль</a></p>
+            <p> <a href="${mailSettings.BASE_URL}/resetPasswordS2/${token}">Изменить пароль</a></p>
 
             <hr />
-            <a href="${keys.BASE_URL}">Feel Lab</a>
+            <a href="${mailSettings.BASE_URL}">Feel Lab</a>
         `,
     }
 }
@@ -140,7 +136,7 @@ module.exports.sendEmail_ChangePassword = async function (email, token) {
 function getDefaultOrderConfirmEmail (email, orderId) {
     return {
         to: email,
-        from: keys.EMAIL_FROM,
+        from: mailSettings.EMAIL_FROM,
         subject: "Ваш заказ оформлен",
         text: "order confirm",
         html:  `
@@ -150,7 +146,7 @@ function getDefaultOrderConfirmEmail (email, orderId) {
             <p> <a href="#">Проверить статус</a></p>
 
             <hr />
-            <a href="${keys.BASE_URL}">Feel Lab</a>
+            <a href="${mailSettings.BASE_URL}">Feel Lab</a>
         `,
     }
 }
